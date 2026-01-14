@@ -69,12 +69,34 @@
     }
 
     .badge {
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: 999px;
       background: var(--card);
       box-shadow: 0 8px 20px rgba(30, 20, 60, 0.08);
       font-size: 0.85rem;
       color: var(--muted);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .badge:not(.interactive) {
+      cursor: default;
+    }
+
+    .badge.interactive {
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .badge.interactive:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(30, 20, 60, 0.14);
+    }
+
+    .badge.interactive:active {
+      transform: translateY(0);
     }
 
     main {
@@ -396,8 +418,7 @@
       <h1>Alex's <span class="sparkle" data-i18n="header-cross">Cross-Border</span> <span data-i18n="header-desk">Currency Desk</span></h1>
       <p data-i18n="header-subtitle">Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.</p>
       <div class="badge-row">
-        <span class="badge" id="status-badge" data-i18n="status-fetching">Fetching live rates...</span>
-        <button class="badge" id="refresh-rates" style="cursor: pointer; border: 1px solid rgba(0,0,0,0.1);" data-i18n="btn-refresh">🔄 Refresh Rates</button>
+        <button class="badge interactive" id="refresh-rates" data-i18n="btn-refresh">🔄 Live rates ready</button>
         <span class="badge" data-i18n="badge-shopee">Shopee + TikTok shop ready</span>
         <span class="badge" data-i18n="badge-offline">Open this file to use anywhere</span>
       </div>
@@ -535,11 +556,9 @@
         "header-cross": "Cross-Border",
         "header-desk": "Currency Desk",
         "header-subtitle": "Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.",
-        "status-fetching": "Fetching live rates...",
-        "status-ready": "Live rates ready",
-        "status-updated": "Live rates updated",
-        "status-unavailable": "Unable to fetch rates",
-        "btn-refresh": "🔄 Refresh Rates",
+        "btn-refresh": "🔄 Live rates ready",
+        "btn-refresh-fetching": "🔄 Fetching rates...",
+        "btn-refresh-error": "🔄 Click to retry",
         "badge-shopee": "Shopee + TikTok shop ready",
         "badge-offline": "Open this file to use anywhere",
         "card-convert": "Quick Convert",
@@ -586,11 +605,9 @@
         "header-cross": "跨境",
         "header-desk": "货币兑换台",
         "header-subtitle": "为深圳卖家精心设计，轻松管理越南、泰国和马来西亚店铺。",
-        "status-fetching": "正在获取实时汇率...",
-        "status-ready": "实时汇率已就绪",
-        "status-updated": "实时汇率已更新",
-        "status-unavailable": "无法获取汇率",
-        "btn-refresh": "🔄 刷新汇率",
+        "btn-refresh": "🔄 实时汇率已就绪",
+        "btn-refresh-fetching": "🔄 正在获取汇率...",
+        "btn-refresh-error": "🔄 点击重试",
         "badge-shopee": "适用于 Shopee + TikTok 小店",
         "badge-offline": "可离线使用",
         "card-convert": "快速兑换",
@@ -672,13 +689,13 @@
     }
 
     function updateStatusText() {
-      const statusBadge = document.getElementById("status-badge");
-      if (statusBadge.textContent.includes("ready") || statusBadge.textContent.includes("就绪")) {
-        statusBadge.textContent = translations[currentLang]["status-ready"];
-      } else if (statusBadge.textContent.includes("updated") || statusBadge.textContent.includes("更新")) {
-        statusBadge.textContent = translations[currentLang]["status-updated"];
-      } else if (statusBadge.textContent.includes("Unable") || statusBadge.textContent.includes("无法")) {
-        statusBadge.textContent = translations[currentLang]["status-unavailable"];
+      const refreshBtn = document.getElementById("refresh-rates");
+      if (refreshBtn.textContent.includes("ready") || refreshBtn.textContent.includes("就绪")) {
+        refreshBtn.textContent = translations[currentLang]["btn-refresh"];
+      } else if (refreshBtn.textContent.includes("Fetching") || refreshBtn.textContent.includes("获取")) {
+        refreshBtn.textContent = translations[currentLang]["btn-refresh-fetching"];
+      } else if (refreshBtn.textContent.includes("retry") || refreshBtn.textContent.includes("重试")) {
+        refreshBtn.textContent = translations[currentLang]["btn-refresh-error"];
       }
     }
 
@@ -763,7 +780,7 @@
       result: document.getElementById("result"),
       rateLine: document.getElementById("rate-line"),
       rates: document.getElementById("rates"),
-      status: document.getElementById("status-badge"),
+      refreshBtn: document.getElementById("refresh-rates"),
       updated: document.getElementById("updated"),
       cost: document.getElementById("cost"),
       sell: document.getElementById("sell"),
@@ -868,9 +885,9 @@
         const converted = amount * rate;
         elements.result.textContent = formatCurrency(converted, to);
         elements.rateLine.innerHTML = `<span data-i18n="rate-label">${translations[currentLang]["rate-label"]}</span>: 1 ${from} = ${formatNumber(rate)} ${to}`;
-        elements.status.textContent = translations[currentLang]["status-ready"];
+        elements.refreshBtn.textContent = translations[currentLang]["btn-refresh"];
       } catch {
-        elements.status.textContent = translations[currentLang]["status-unavailable"];
+        elements.refreshBtn.textContent = translations[currentLang]["btn-refresh-error"];
       }
     };
 
@@ -886,9 +903,10 @@
           })
           .join("");
         elements.updated.textContent = data.date;
-        elements.status.textContent = `${translations[currentLang]["status-updated"]} ${data.date}`;
+        elements.refreshBtn.textContent = translations[currentLang]["btn-refresh"];
       } catch {
-        elements.rates.innerHTML = `<div class="rate-item">${translations[currentLang]["status-unavailable"]}</div>`;
+        elements.rates.innerHTML = `<div class="rate-item">${translations[currentLang]["btn-refresh-error"]}</div>`;
+        elements.refreshBtn.textContent = translations[currentLang]["btn-refresh-error"];
       }
     }
 
@@ -1006,7 +1024,7 @@
       Object.keys(cache).forEach(key => delete cache[key]);
 
       // Update status to show fetching
-      elements.status.textContent = translations[currentLang]["status-fetching"];
+      elements.refreshBtn.textContent = translations[currentLang]["btn-refresh-fetching"];
 
       // Refresh all data
       await updateRatesPanel();
