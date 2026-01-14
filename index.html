@@ -624,6 +624,9 @@
 
     let currentLang = localStorage.getItem("alex-desk-lang") || "en";
 
+    // Store references to update functions (will be set by initApp)
+    let updateAllSelects, updateConverter, updateMargin, updatePayout, updateCharm;
+
     function switchLanguage(lang) {
       currentLang = lang;
       localStorage.setItem("alex-desk-lang", lang);
@@ -649,7 +652,7 @@
       langToggle.textContent = lang === "en" ? "中文" : "English";
 
       // Re-render dynamic content if app is loaded
-      if (window.appLoaded) {
+      if (window.appLoaded && updateAllSelects) {
         updateStatusText();
         updateAllSelects();
         // Refresh all calculations to update language
@@ -779,7 +782,8 @@
       select.value = defaultValue;
     }
 
-    function updateAllSelects() {
+    // Assign to outer scope variable so switchLanguage can access it
+    updateAllSelects = function() {
       // Update all select dropdowns with new language
       const selects = [
         { elem: elements.from, value: elements.from.value },
@@ -796,7 +800,7 @@
           .join("");
         elem.value = value;
       });
-    }
+    };
 
     function formatCurrency(value, code) {
       try {
@@ -846,7 +850,8 @@
       return data[from.toLowerCase()][key];
     }
 
-    async function updateConverter() {
+    // Assign to outer scope variable
+    updateConverter = async function() {
       const amount = parseFloat(elements.amount.value) || 0;
       const from = elements.from.value;
       const to = elements.to.value;
@@ -859,7 +864,7 @@
       } catch {
         elements.status.textContent = translations[currentLang]["status-unavailable"];
       }
-    }
+    };
 
     async function updateRatesPanel() {
       try {
@@ -879,7 +884,8 @@
       }
     }
 
-    async function updateMargin() {
+    // Assign to outer scope variable
+    updateMargin = async function() {
       const cost = parseFloat(elements.cost.value) || 0;
       const sell = parseFloat(elements.sell.value) || 0;
       const sellCurrency = elements.sellCurrency.value;
@@ -896,9 +902,10 @@
       } catch {
         elements.marginResult.textContent = "--";
       }
-    }
+    };
 
-    async function updatePayout() {
+    // Assign to outer scope variable
+    updatePayout = async function() {
       const daily = parseFloat(elements.daily.value) || 0;
       const days = parseFloat(elements.days.value) || 0;
       const currency = elements.dailyCurrency.value;
@@ -912,7 +919,7 @@
       } catch {
         elements.payoutResult.textContent = "--";
       }
-    }
+    };
 
     function applyCharm(value, style) {
       if (style === "none") return value;
@@ -925,7 +932,8 @@
       return candidate;
     }
 
-    async function updateCharm() {
+    // Assign to outer scope variable
+    updateCharm = async function() {
       const baseRmb = parseFloat(elements.baseRmb.value) || 0;
       const currency = elements.charmCurrency.value;
       const style = elements.charmStyle.value;
@@ -937,7 +945,7 @@
       } catch {
         elements.charmResult.textContent = "--";
       }
-    }
+    };
 
     function bindUpdates() {
       [
