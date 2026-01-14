@@ -345,19 +345,21 @@
       top: 20px;
       right: 20px;
       z-index: 1000;
-      background: var(--card);
+      background: linear-gradient(140deg, #ff9f8a, #ff6f99);
+      color: white;
       border-radius: 12px;
       padding: 8px 16px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 20px rgba(255, 120, 130, 0.4);
       cursor: pointer;
       font-weight: 600;
       font-size: 0.9rem;
       border: none;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .lang-toggle:hover {
       transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 120, 130, 0.5);
     }
 
     @media (max-width: 720px) {
@@ -565,7 +567,8 @@
         "note-3": "- Share this file directly; it runs offline after the first rate load.",
         "footer-text": "Rates powered by a daily open currency feed. Last updated",
         "result-profit": "profit",
-        "result-margin": "margin"
+        "result-margin": "margin",
+        "charm-raw": "raw"
       },
       zh: {
         "password-title": "🔐 访问受限",
@@ -614,7 +617,8 @@
         "note-3": "- 可直接分享此文件，首次加载汇率后可离线使用。",
         "footer-text": "汇率由每日开放货币数据源提供。最后更新",
         "result-profit": "利润",
-        "result-margin": "利润率"
+        "result-margin": "利润率",
+        "charm-raw": "原价"
       }
     };
 
@@ -647,6 +651,7 @@
       // Re-render dynamic content if app is loaded
       if (window.appLoaded) {
         updateStatusText();
+        updateAllSelects();
         // Refresh all calculations to update language
         updateConverter();
         updateMargin();
@@ -718,11 +723,20 @@
     function initApp() {
     window.appLoaded = true;
     const CURRENCIES = {
-      USD: "US Dollar",
-      CNY: "Chinese Yuan (RMB)",
-      VND: "Vietnamese Dong",
-      THB: "Thai Baht",
-      MYR: "Malaysian Ringgit"
+      en: {
+        USD: "US Dollar",
+        CNY: "Chinese Yuan (RMB)",
+        VND: "Vietnamese Dong",
+        THB: "Thai Baht",
+        MYR: "Malaysian Ringgit"
+      },
+      zh: {
+        USD: "美元",
+        CNY: "人民币",
+        VND: "越南盾",
+        THB: "泰铢",
+        MYR: "马来西亚林吉特"
+      }
     };
 
     const cache = {};
@@ -758,10 +772,30 @@
     };
 
     function populateSelect(select, defaultValue) {
-      select.innerHTML = Object.entries(CURRENCIES)
+      const currencyNames = CURRENCIES[currentLang];
+      select.innerHTML = Object.entries(currencyNames)
         .map(([code, name]) => `<option value="${code}">${code} - ${name}</option>`)
         .join("");
       select.value = defaultValue;
+    }
+
+    function updateAllSelects() {
+      // Update all select dropdowns with new language
+      const selects = [
+        { elem: elements.from, value: elements.from.value },
+        { elem: elements.to, value: elements.to.value },
+        { elem: elements.sellCurrency, value: elements.sellCurrency.value },
+        { elem: elements.dailyCurrency, value: elements.dailyCurrency.value },
+        { elem: elements.charmCurrency, value: elements.charmCurrency.value }
+      ];
+
+      selects.forEach(({ elem, value }) => {
+        const currencyNames = CURRENCIES[currentLang];
+        elem.innerHTML = Object.entries(currencyNames)
+          .map(([code, name]) => `<option value="${code}">${code} - ${name}</option>`)
+          .join("");
+        elem.value = value;
+      });
     }
 
     function formatCurrency(value, code) {
@@ -899,7 +933,7 @@
         const rate = await getRate("CNY", currency);
         const raw = baseRmb * rate;
         const priced = applyCharm(raw, style);
-        elements.charmResult.textContent = `${formatCurrency(priced, currency)} (raw ${formatCurrency(raw, currency)})`;
+        elements.charmResult.textContent = `${formatCurrency(priced, currency)} (${translations[currentLang]["charm-raw"]} ${formatCurrency(raw, currency)})`;
       } catch {
         elements.charmResult.textContent = "--";
       }
