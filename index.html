@@ -339,15 +339,46 @@
     .content-wrapper.unlocked {
       display: block;
     }
+
+    .lang-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 8px 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      transition: transform 0.2s ease;
+    }
+
+    .lang-toggle:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 720px) {
+      .lang-toggle {
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <button id="lang-toggle" class="lang-toggle">中文</button>
+
   <div id="password-overlay" class="password-overlay">
     <div class="password-box">
-      <h2>🔐 Protected Access</h2>
-      <p>Enter the passcode to access Alex's Currency Desk</p>
-      <input id="password-input" type="password" placeholder="Enter passcode" autocomplete="off" />
-      <button id="password-submit">Unlock</button>
+      <h2 data-i18n="password-title">🔐 Protected Access</h2>
+      <p data-i18n="password-desc">Enter the passcode to access Alex's Currency Desk</p>
+      <input id="password-input" type="password" data-i18n-placeholder="password-placeholder" placeholder="Enter passcode" autocomplete="off" />
+      <button id="password-submit" data-i18n="password-unlock">Unlock</button>
       <div id="password-error" class="password-error"></div>
     </div>
   </div>
@@ -355,136 +386,294 @@
   <div id="content-wrapper" class="content-wrapper">
   <div class="wrap">
     <header>
-      <h1>Alex's <span class="sparkle">Cross-Border</span> Currency Desk</h1>
-      <p>Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.</p>
+      <h1>Alex's <span class="sparkle" data-i18n="header-cross">Cross-Border</span> <span data-i18n="header-desk">Currency Desk</span></h1>
+      <p data-i18n="header-subtitle">Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.</p>
       <div class="badge-row">
-        <span class="badge" id="status-badge">Fetching live rates...</span>
-        <span class="badge">Shopee + TikTok shop ready</span>
-        <span class="badge">Open this file to use anywhere</span>
+        <span class="badge" id="status-badge" data-i18n="status-fetching">Fetching live rates...</span>
+        <span class="badge" data-i18n="badge-shopee">Shopee + TikTok shop ready</span>
+        <span class="badge" data-i18n="badge-offline">Open this file to use anywhere</span>
       </div>
     </header>
 
     <main>
       <section class="grid">
         <div class="card">
-          <h2>Quick Convert</h2>
+          <h2 data-i18n="card-convert">Quick Convert</h2>
           <div class="field">
-            <label for="amount">Amount</label>
+            <label for="amount" data-i18n="label-amount">Amount</label>
             <input id="amount" type="number" step="0.01" value="100" />
           </div>
           <div class="row swap-row">
             <div class="field" style="flex: 1; min-width: 140px;">
-              <label for="from">From</label>
+              <label for="from" data-i18n="label-from">From</label>
               <select id="from"></select>
             </div>
-            <button class="swap" id="swap" type="button" aria-label="Swap currencies">Swap</button>
+            <button class="swap" id="swap" type="button" aria-label="Swap currencies" data-i18n="btn-swap">Swap</button>
             <div class="field" style="flex: 1; min-width: 140px;">
-              <label for="to">To</label>
+              <label for="to" data-i18n="label-to">To</label>
               <select id="to"></select>
             </div>
           </div>
           <div class="row" style="margin-top: 8px;">
-            <button id="convert" type="button">Convert</button>
-            <span class="pill" id="rate-line">Rate: --</span>
+            <button id="convert" type="button" data-i18n="btn-convert">Convert</button>
+            <span class="pill" id="rate-line"><span data-i18n="rate-label">Rate</span>: --</span>
           </div>
           <div class="result" id="result">--</div>
           <img class="card-art" src="https://images.pexels.com/photos/5942707/pexels-photo-5942707.jpeg?cs=srgb&dl=pexels-karola-g-5942707.jpg&fm=jpg" alt="Desk with currency notes and calculator" loading="lazy" />
         </div>
 
         <div class="card">
-          <h2>Live Rate Glance</h2>
+          <h2 data-i18n="card-rates">Live Rate Glance</h2>
           <div class="rates" id="rates"></div>
           <img class="card-art" src="https://images.pexels.com/photos/8441819/pexels-photo-8441819.jpeg?cs=srgb&dl=pexels-kampus-8441819.jpg&fm=jpg" alt="Laptop with analytics dashboard" loading="lazy" />
         </div>
 
         <div class="card">
-          <h2>Platform Margin Check</h2>
+          <h2 data-i18n="card-margin">Platform Margin Check</h2>
           <div class="field">
-            <label for="cost">Cost (RMB)</label>
+            <label for="cost" data-i18n="label-cost">Cost (RMB)</label>
             <input id="cost" type="number" step="0.01" value="55" />
           </div>
           <div class="field">
-            <label for="sell">Selling price (local currency)</label>
+            <label for="sell" data-i18n="label-sell">Selling price (local currency)</label>
             <input id="sell" type="number" step="0.01" value="180" />
           </div>
           <div class="field">
-            <label for="sell-currency">Selling currency</label>
+            <label for="sell-currency" data-i18n="label-sell-currency">Selling currency</label>
             <select id="sell-currency"></select>
           </div>
           <div class="row">
             <div class="field" style="flex: 1;">
-              <label for="fee">Platform fee %</label>
+              <label for="fee" data-i18n="label-fee">Platform fee %</label>
               <input id="fee" type="number" step="0.1" value="6" />
             </div>
             <div class="field" style="flex: 1;">
-              <label for="ads">Ads %</label>
+              <label for="ads" data-i18n="label-ads">Ads %</label>
               <input id="ads" type="number" step="0.1" value="4" />
             </div>
           </div>
           <div class="field">
-            <label for="shipping">Shipping + fulfillment (RMB)</label>
+            <label for="shipping" data-i18n="label-shipping">Shipping + fulfillment (RMB)</label>
             <input id="shipping" type="number" step="0.01" value="12" />
           </div>
           <div class="result" id="margin-result">--</div>
-          <p class="muted">Adjust fee/ads based on Shopee or TikTok promos.</p>
+          <p class="muted" data-i18n="margin-note">Adjust fee/ads based on Shopee or TikTok promos.</p>
         </div>
       </section>
 
       <section class="grid">
         <div class="card">
-          <h2>Payout Planner</h2>
+          <h2 data-i18n="card-payout">Payout Planner</h2>
           <div class="field">
-            <label for="daily">Daily revenue (local currency)</label>
+            <label for="daily" data-i18n="label-daily">Daily revenue (local currency)</label>
             <input id="daily" type="number" step="0.01" value="850" />
           </div>
           <div class="field">
-            <label for="daily-currency">Revenue currency</label>
+            <label for="daily-currency" data-i18n="label-daily-currency">Revenue currency</label>
             <select id="daily-currency"></select>
           </div>
           <div class="field">
-            <label for="days">Days to project</label>
+            <label for="days" data-i18n="label-days">Days to project</label>
             <input id="days" type="number" step="1" value="14" />
           </div>
           <div class="result" id="payout-result">--</div>
         </div>
 
         <div class="card">
-          <h2>Charm Pricing Helper</h2>
+          <h2 data-i18n="card-charm">Charm Pricing Helper</h2>
           <div class="field">
-            <label for="base-rmb">Base price (RMB)</label>
+            <label for="base-rmb" data-i18n="label-base">Base price (RMB)</label>
             <input id="base-rmb" type="number" step="0.01" value="68" />
           </div>
           <div class="field">
-            <label for="charm-currency">Target currency</label>
+            <label for="charm-currency" data-i18n="label-target">Target currency</label>
             <select id="charm-currency"></select>
           </div>
           <div class="field">
-            <label for="charm-style">Charm style</label>
+            <label for="charm-style" data-i18n="label-charm-style">Charm style</label>
             <select id="charm-style">
-              <option value="none">No charm</option>
+              <option value="none" data-i18n="charm-none">No charm</option>
               <option value=".90">.90</option>
               <option value=".95">.95</option>
               <option value=".99">.99</option>
             </select>
           </div>
           <div class="result" id="charm-result">--</div>
-          <p class="muted">Great for Shopee listings and TikTok live bundles.</p>
+          <p class="muted" data-i18n="charm-note">Great for Shopee listings and TikTok live bundles.</p>
         </div>
 
         <div class="card">
-          <h2>Notes for Alex</h2>
-          <p class="muted">- Keep promo fees + ads updated for each campaign.</p>
-          <p class="muted">- Use VND, THB, MYR quick rates before repricing SKUs.</p>
-          <p class="muted">- Share this file directly; it runs offline after the first rate load.</p>
+          <h2 data-i18n="card-notes">Notes for Alex</h2>
+          <p class="muted" data-i18n="note-1">- Keep promo fees + ads updated for each campaign.</p>
+          <p class="muted" data-i18n="note-2">- Use VND, THB, MYR quick rates before repricing SKUs.</p>
+          <p class="muted" data-i18n="note-3">- Share this file directly; it runs offline after the first rate load.</p>
         </div>
       </section>
     </main>
 
-    <div class="footer-note">Rates powered by a daily open currency feed. Last updated: <span id="updated">--</span>.</div>
+    <div class="footer-note"><span data-i18n="footer-text">Rates powered by a daily open currency feed. Last updated</span>: <span id="updated">--</span>.</div>
   </div>
   </div>
 
   <script>
+    // Translations
+    const translations = {
+      en: {
+        "password-title": "🔐 Protected Access",
+        "password-desc": "Enter the passcode to access Alex's Currency Desk",
+        "password-placeholder": "Enter passcode",
+        "password-unlock": "Unlock",
+        "password-error": "❌ Incorrect passcode. Try again.",
+        "header-cross": "Cross-Border",
+        "header-desk": "Currency Desk",
+        "header-subtitle": "Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.",
+        "status-fetching": "Fetching live rates...",
+        "status-ready": "Live rates ready",
+        "status-updated": "Live rates updated",
+        "status-unavailable": "Unable to fetch rates",
+        "badge-shopee": "Shopee + TikTok shop ready",
+        "badge-offline": "Open this file to use anywhere",
+        "card-convert": "Quick Convert",
+        "label-amount": "Amount",
+        "label-from": "From",
+        "label-to": "To",
+        "btn-swap": "Swap",
+        "btn-convert": "Convert",
+        "rate-label": "Rate",
+        "card-rates": "Live Rate Glance",
+        "card-margin": "Platform Margin Check",
+        "label-cost": "Cost (RMB)",
+        "label-sell": "Selling price (local currency)",
+        "label-sell-currency": "Selling currency",
+        "label-fee": "Platform fee %",
+        "label-ads": "Ads %",
+        "label-shipping": "Shipping + fulfillment (RMB)",
+        "margin-note": "Adjust fee/ads based on Shopee or TikTok promos.",
+        "card-payout": "Payout Planner",
+        "label-daily": "Daily revenue (local currency)",
+        "label-daily-currency": "Revenue currency",
+        "label-days": "Days to project",
+        "card-charm": "Charm Pricing Helper",
+        "label-base": "Base price (RMB)",
+        "label-target": "Target currency",
+        "label-charm-style": "Charm style",
+        "charm-none": "No charm",
+        "charm-note": "Great for Shopee listings and TikTok live bundles.",
+        "card-notes": "Notes for Alex",
+        "note-1": "- Keep promo fees + ads updated for each campaign.",
+        "note-2": "- Use VND, THB, MYR quick rates before repricing SKUs.",
+        "note-3": "- Share this file directly; it runs offline after the first rate load.",
+        "footer-text": "Rates powered by a daily open currency feed. Last updated",
+        "result-profit": "profit",
+        "result-margin": "margin"
+      },
+      zh: {
+        "password-title": "🔐 访问受限",
+        "password-desc": "请输入密码以访问 Alex 的货币兑换台",
+        "password-placeholder": "输入密码",
+        "password-unlock": "解锁",
+        "password-error": "❌ 密码错误，请重试。",
+        "header-cross": "跨境",
+        "header-desk": "货币兑换台",
+        "header-subtitle": "为深圳卖家精心设计，轻松管理越南、泰国和马来西亚店铺。",
+        "status-fetching": "正在获取实时汇率...",
+        "status-ready": "实时汇率已就绪",
+        "status-updated": "实时汇率已更新",
+        "status-unavailable": "无法获取汇率",
+        "badge-shopee": "适用于 Shopee + TikTok 小店",
+        "badge-offline": "可离线使用",
+        "card-convert": "快速兑换",
+        "label-amount": "金额",
+        "label-from": "从",
+        "label-to": "到",
+        "btn-swap": "互换",
+        "btn-convert": "兑换",
+        "rate-label": "汇率",
+        "card-rates": "实时汇率一览",
+        "card-margin": "平台利润计算",
+        "label-cost": "成本（人民币）",
+        "label-sell": "售价（当地货币）",
+        "label-sell-currency": "销售货币",
+        "label-fee": "平台费用 %",
+        "label-ads": "广告费用 %",
+        "label-shipping": "物流+履约费（人民币）",
+        "margin-note": "根据 Shopee 或 TikTok 促销活动调整费用和广告。",
+        "card-payout": "收款规划",
+        "label-daily": "日收入（当地货币）",
+        "label-daily-currency": "收入货币",
+        "label-days": "预测天数",
+        "card-charm": "价格尾数优化",
+        "label-base": "基础价格（人民币）",
+        "label-target": "目标货币",
+        "label-charm-style": "尾数风格",
+        "charm-none": "无尾数",
+        "charm-note": "适合 Shopee 商品和 TikTok 直播套餐定价。",
+        "card-notes": "给 Alex 的提示",
+        "note-1": "- 及时更新每次活动的促销费用和广告费。",
+        "note-2": "- 调价前先查看越南盾、泰铢、马币的快速汇率。",
+        "note-3": "- 可直接分享此文件，首次加载汇率后可离线使用。",
+        "footer-text": "汇率由每日开放货币数据源提供。最后更新",
+        "result-profit": "利润",
+        "result-margin": "利润率"
+      }
+    };
+
+    let currentLang = localStorage.getItem("alex-desk-lang") || "en";
+
+    function switchLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("alex-desk-lang", lang);
+
+      // Update all elements with data-i18n attribute
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      // Update placeholders
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (translations[lang][key]) {
+          el.placeholder = translations[lang][key];
+        }
+      });
+
+      // Update toggle button
+      const langToggle = document.getElementById("lang-toggle");
+      langToggle.textContent = lang === "en" ? "中文" : "English";
+
+      // Re-render dynamic content if app is loaded
+      if (window.appLoaded) {
+        updateStatusText();
+        // Refresh all calculations to update language
+        updateConverter();
+        updateMargin();
+        updatePayout();
+        updateCharm();
+      }
+    }
+
+    function updateStatusText() {
+      const statusBadge = document.getElementById("status-badge");
+      if (statusBadge.textContent.includes("ready") || statusBadge.textContent.includes("就绪")) {
+        statusBadge.textContent = translations[currentLang]["status-ready"];
+      } else if (statusBadge.textContent.includes("updated") || statusBadge.textContent.includes("更新")) {
+        statusBadge.textContent = translations[currentLang]["status-updated"];
+      } else if (statusBadge.textContent.includes("Unable") || statusBadge.textContent.includes("无法")) {
+        statusBadge.textContent = translations[currentLang]["status-unavailable"];
+      }
+    }
+
+    // Initialize language on load
+    switchLanguage(currentLang);
+
+    // Language toggle button
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      switchLanguage(currentLang === "en" ? "zh" : "en");
+    });
+
     // Password protection
     (function() {
       const CORRECT_PASSWORD = "sfls";
@@ -511,7 +700,7 @@
           passwordError.textContent = "";
           initApp();
         } else {
-          passwordError.textContent = "❌ Incorrect passcode. Try again.";
+          passwordError.textContent = translations[currentLang]["password-error"];
           passwordInput.value = "";
           passwordInput.focus();
         }
@@ -527,6 +716,7 @@
     })();
 
     function initApp() {
+    window.appLoaded = true;
     const CURRENCIES = {
       USD: "US Dollar",
       CNY: "Chinese Yuan (RMB)",
@@ -630,10 +820,10 @@
         const rate = await getRate(from, to);
         const converted = amount * rate;
         elements.result.textContent = formatCurrency(converted, to);
-        elements.rateLine.textContent = `Rate: 1 ${from} = ${formatNumber(rate)} ${to}`;
-        elements.status.textContent = "Live rates ready";
+        elements.rateLine.innerHTML = `<span data-i18n="rate-label">${translations[currentLang]["rate-label"]}</span>: 1 ${from} = ${formatNumber(rate)} ${to}`;
+        elements.status.textContent = translations[currentLang]["status-ready"];
       } catch {
-        elements.status.textContent = "Unable to fetch rates";
+        elements.status.textContent = translations[currentLang]["status-unavailable"];
       }
     }
 
@@ -649,9 +839,9 @@
           })
           .join("");
         elements.updated.textContent = data.date;
-        elements.status.textContent = `Live rates updated ${data.date}`;
+        elements.status.textContent = `${translations[currentLang]["status-updated"]} ${data.date}`;
       } catch {
-        elements.rates.innerHTML = `<div class="rate-item">Rates unavailable. Try refreshing.</div>`;
+        elements.rates.innerHTML = `<div class="rate-item">${translations[currentLang]["status-unavailable"]}</div>`;
       }
     }
 
@@ -668,7 +858,7 @@
         const revenueRmb = sell * rate;
         const netRmb = revenueRmb * (1 - fee - ads) - shipping - cost;
         const margin = revenueRmb ? (netRmb / revenueRmb) * 100 : 0;
-        elements.marginResult.textContent = `${formatCurrency(netRmb, "CNY")} profit • ${margin.toFixed(1)}% margin`;
+        elements.marginResult.textContent = `${formatCurrency(netRmb, "CNY")} ${translations[currentLang]["result-profit"]} • ${margin.toFixed(1)}% ${translations[currentLang]["result-margin"]}`;
       } catch {
         elements.marginResult.textContent = "--";
       }
