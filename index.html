@@ -226,7 +226,11 @@
 
     @media (max-width: 720px) {
       .wrap {
-        padding: 20px 16px 48px;
+        padding: 60px 16px 48px;
+      }
+
+      header {
+        margin-top: 0;
       }
 
       .row {
@@ -355,6 +359,7 @@
       font-size: 0.9rem;
       border: none;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
     }
 
     .lang-toggle:hover {
@@ -392,6 +397,7 @@
       <p data-i18n="header-subtitle">Elegant, cute, and made for a Shenzhen seller running stores across Vietnam, Thailand, and Malaysia.</p>
       <div class="badge-row">
         <span class="badge" id="status-badge" data-i18n="status-fetching">Fetching live rates...</span>
+        <button class="badge" id="refresh-rates" style="cursor: pointer; border: 1px solid rgba(0,0,0,0.1);" data-i18n="btn-refresh">🔄 Refresh Rates</button>
         <span class="badge" data-i18n="badge-shopee">Shopee + TikTok shop ready</span>
         <span class="badge" data-i18n="badge-offline">Open this file to use anywhere</span>
       </div>
@@ -533,6 +539,7 @@
         "status-ready": "Live rates ready",
         "status-updated": "Live rates updated",
         "status-unavailable": "Unable to fetch rates",
+        "btn-refresh": "🔄 Refresh Rates",
         "badge-shopee": "Shopee + TikTok shop ready",
         "badge-offline": "Open this file to use anywhere",
         "card-convert": "Quick Convert",
@@ -583,6 +590,7 @@
         "status-ready": "实时汇率已就绪",
         "status-updated": "实时汇率已更新",
         "status-unavailable": "无法获取汇率",
+        "btn-refresh": "🔄 刷新汇率",
         "badge-shopee": "适用于 Shopee + TikTok 小店",
         "badge-offline": "可离线使用",
         "card-convert": "快速兑换",
@@ -991,6 +999,30 @@
     populateSelect(elements.dailyCurrency, "THB");
     populateSelect(elements.charmCurrency, "MYR");
     bindUpdates();
+
+    // Function to refresh all rates
+    async function refreshAllRates() {
+      // Clear the cache
+      Object.keys(cache).forEach(key => delete cache[key]);
+
+      // Update status to show fetching
+      elements.status.textContent = translations[currentLang]["status-fetching"];
+
+      // Refresh all data
+      await updateRatesPanel();
+      await updateConverter();
+      await updateMargin();
+      await updatePayout();
+      await updateCharm();
+    }
+
+    // Refresh button functionality
+    document.getElementById("refresh-rates").addEventListener("click", refreshAllRates);
+
+    // Auto-refresh every 6 hours (21600000 milliseconds)
+    setInterval(refreshAllRates, 21600000);
+
+    // Initial load
     updateRatesPanel();
     updateConverter();
     updateMargin();
