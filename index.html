@@ -266,9 +266,85 @@
         font-size: 16px !important;
       }
     }
+
+    /* Password protection overlay */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(140deg, #fef7ef 0%, #f6f6ff 45%, #eff9f4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .password-overlay.hidden {
+      display: none;
+    }
+
+    .password-box {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .password-box h2 {
+      font-family: "Fraunces", serif;
+      font-size: 1.8rem;
+      margin: 0 0 12px;
+    }
+
+    .password-box p {
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    .password-box input {
+      width: 100%;
+      margin-bottom: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .password-box button {
+      width: 100%;
+    }
+
+    .password-error {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .content-wrapper {
+      display: none;
+    }
+
+    .content-wrapper.unlocked {
+      display: block;
+    }
   </style>
 </head>
 <body>
+  <div id="password-overlay" class="password-overlay">
+    <div class="password-box">
+      <h2>🔐 Protected Access</h2>
+      <p>Enter the passcode to access Alex's Currency Desk</p>
+      <input id="password-input" type="password" placeholder="Enter passcode" autocomplete="off" />
+      <button id="password-submit">Unlock</button>
+      <div id="password-error" class="password-error"></div>
+    </div>
+  </div>
+
+  <div id="content-wrapper" class="content-wrapper">
   <div class="wrap">
     <header>
       <h1>Alex's <span class="sparkle">Cross-Border</span> Currency Desk</h1>
@@ -398,8 +474,51 @@
 
     <div class="footer-note">Rates powered by a daily open currency feed. Last updated: <span id="updated">--</span>.</div>
   </div>
+  </div>
 
   <script>
+    // Password protection
+    (function() {
+      const CORRECT_PASSWORD = "sfls";
+      const overlay = document.getElementById("password-overlay");
+      const contentWrapper = document.getElementById("content-wrapper");
+      const passwordInput = document.getElementById("password-input");
+      const passwordSubmit = document.getElementById("password-submit");
+      const passwordError = document.getElementById("password-error");
+
+      // Check if already authenticated in this session
+      if (sessionStorage.getItem("alex-desk-auth") === "true") {
+        overlay.classList.add("hidden");
+        contentWrapper.classList.add("unlocked");
+        initApp();
+        return;
+      }
+
+      function checkPassword() {
+        const input = passwordInput.value.toLowerCase().trim();
+        if (input === CORRECT_PASSWORD) {
+          sessionStorage.setItem("alex-desk-auth", "true");
+          overlay.classList.add("hidden");
+          contentWrapper.classList.add("unlocked");
+          passwordError.textContent = "";
+          initApp();
+        } else {
+          passwordError.textContent = "❌ Incorrect passcode. Try again.";
+          passwordInput.value = "";
+          passwordInput.focus();
+        }
+      }
+
+      passwordSubmit.addEventListener("click", checkPassword);
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") checkPassword();
+      });
+
+      // Focus password input on load
+      setTimeout(() => passwordInput.focus(), 100);
+    })();
+
+    function initApp() {
     const CURRENCIES = {
       USD: "US Dollar",
       CNY: "Chinese Yuan (RMB)",
@@ -626,21 +745,18 @@
       ].forEach((el) => el.addEventListener("input", updateCharm));
     }
 
-    function init() {
-      populateSelect(elements.from, "CNY");
-      populateSelect(elements.to, "VND");
-      populateSelect(elements.sellCurrency, "VND");
-      populateSelect(elements.dailyCurrency, "THB");
-      populateSelect(elements.charmCurrency, "MYR");
-      bindUpdates();
-      updateRatesPanel();
-      updateConverter();
-      updateMargin();
-      updatePayout();
-      updateCharm();
+    populateSelect(elements.from, "CNY");
+    populateSelect(elements.to, "VND");
+    populateSelect(elements.sellCurrency, "VND");
+    populateSelect(elements.dailyCurrency, "THB");
+    populateSelect(elements.charmCurrency, "MYR");
+    bindUpdates();
+    updateRatesPanel();
+    updateConverter();
+    updateMargin();
+    updatePayout();
+    updateCharm();
     }
-
-    init();
   </script>
 </body>
 </html>
